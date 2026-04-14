@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #0a0c08;
+  --color-elevated: #12140e;
+  --color-accent: #c9a84c;
+  --color-accent-dim: rgba(201, 168, 76, 0.15);
+  --color-muted: #7a7862;
+  --color-dim: #2e2e24;
+  --color-edge: #3a3a2e;
+
+  --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), "Courier New", monospace;
+}
+
+:root {
+  --tile-w: 14vw;
+  --tile-h: 18vw;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --tile-w: 28vw;
+    --tile-h: 35vw;
+  }
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Keyframe Animations ─────────────────────────── */
+
+@keyframes mural-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, -50%, 0);
+  }
+}
+
+@keyframes scan-move {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes tile-expand {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes tile-flash {
+  0% {
+    opacity: 1;
+  }
+  5% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  14% {
+    opacity: 0;
+  }
+  19% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes chrome-snap {
+  from {
+    opacity: 0;
+    transform: scale(1.5) translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes chrome-slide-down {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes chrome-slide-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes chrome-slide-right {
+  from {
+    opacity: 0;
+    transform: translate3d(-10px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes chrome-slide-left {
+  from {
+    opacity: 0;
+    transform: translate3d(10px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ── Compound selectors requiring custom CSS ─────── */
+
+.mural-highlighting {
+  overflow: visible;
+}
+
+.mural-highlighting button:not(.tile-highlighted) {
+  contain: layout style paint;
+}
+.mural-highlighting button:not(.tile-highlighted) img {
+  opacity: 0.15;
+  transition: opacity 0.25s ease-out;
+}
+
+.tile-highlighted {
+  z-index: 30 !important;
+  will-change: transform;
+  box-shadow: 0 0 24px rgba(201, 168, 76, 0.35);
+  animation: tile-expand 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tile-highlighted img {
+  will-change: opacity;
+  animation: tile-flash 1.2s ease-out forwards;
+}
+
+/* ── Modal chrome staggered animations ───────────── */
+
+.modal-open .modal-corner {
+  animation: chrome-snap 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+.modal-open .modal-top-bar {
+  animation: chrome-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.modal-open .modal-nav-prev {
+  animation: chrome-slide-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.modal-open .modal-nav-next {
+  animation: chrome-slide-left 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.modal-open .modal-bottom-bar {
+  animation: chrome-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}

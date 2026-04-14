@@ -1,0 +1,344 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "inter-tight-variable", sans-serif;
+}
+
+/* CHAOS PHASE STYLES - gentler for epilepsy safety */
+.chaos-container {
+  animation: hue-rotate 3s linear infinite;
+}
+
+@keyframes hue-rotate {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.chaos-screen {
+  animation: wobble 1.4s ease-in-out infinite, zoom-pulse 1s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-2px, 2px) rotate(-0.3deg); }
+  50% { transform: translate(2px, -2px) rotate(0.3deg); }
+  75% { transform: translate(-1px, -1px) rotate(-0.2deg); }
+}
+
+@keyframes zoom-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Flashing background - slower and less intense for epilepsy safety */
+.flash-bg {
+  animation: flash 2s linear infinite;
+}
+
+@keyframes flash {
+  0% { background: linear-gradient(45deg, #ff6666, #ffaa66); }
+  14% { background: linear-gradient(90deg, #ffaa66, #ffff99); }
+  28% { background: linear-gradient(135deg, #ffff99, #99ff99); }
+  42% { background: linear-gradient(180deg, #99ff99, #99ffff); }
+  57% { background: linear-gradient(225deg, #99ffff, #9999ff); }
+  71% { background: linear-gradient(270deg, #9999ff, #ff99ff); }
+  85% { background: linear-gradient(315deg, #ff99ff, #ff6666); }
+  100% { background: linear-gradient(360deg, #ff6666, #ffaa66); }
+}
+
+/* Confetti */
+.confetti {
+  animation: confetti-fall 4s linear infinite;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0.5;
+  }
+}
+
+/* Chaos images */
+.chaos-image {
+  animation: chaos-spawn 0.3s ease-out, chaos-shake 0.5s ease-in-out infinite;
+}
+
+@keyframes chaos-spawn {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5) rotate(180deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes chaos-shake {
+  0%, 100% { 
+    filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+  }
+  25% { 
+    filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.8));
+    transform: translateX(-2px) translateY(2px);
+  }
+  50% { 
+    filter: drop-shadow(0 0 20px rgba(0, 0, 255, 0.8));
+    transform: translateX(2px) translateY(-2px);
+  }
+  75% { 
+    filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.8));
+    transform: translateX(-2px) translateY(-2px);
+  }
+}
+
+/* Birthday text */
+.birthday-text {
+  animation: birthday-bounce 0.5s ease-in-out infinite, birthday-glow 1s linear infinite;
+  text-shadow: 
+    0 0 10px #fff,
+    0 0 20px #fff,
+    0 0 30px #ff00ff,
+    0 0 40px #ff00ff,
+    0 0 50px #ff00ff,
+    0 0 60px #ff00ff;
+}
+
+@keyframes birthday-bounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+  50% { transform: translate(-50%, -50%) scale(1.1) rotate(2deg); }
+}
+
+@keyframes birthday-glow {
+  0% { text-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000; }
+  33% { text-shadow: 0 0 30px #00ff00, 0 0 60px #00ff00; }
+  66% { text-shadow: 0 0 30px #0000ff, 0 0 60px #0000ff; }
+  100% { text-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000; }
+}
+
+.rainbow-text {
+  animation: rainbow 1.5s linear infinite;
+}
+
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg) brightness(1.5); }
+  100% { filter: hue-rotate(360deg) brightness(1.5); }
+}
+
+/* Floating emojis */
+.floating-emoji {
+  animation: float-up 5s linear infinite;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg) scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20vh) rotate(360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Explosions */
+.explosion {
+  animation: explode 2s ease-out infinite;
+  background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,100,0,0.8) 30%, rgba(255,0,0,0) 70%);
+  pointer-events: none;
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Extra chaos effects */
+.chaos-container::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 2px,
+      rgba(0, 0, 0, 0.1) 4px
+    );
+  pointer-events: none;
+  z-index: 50;
+  animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Glitch effect on images */
+.chaos-image:hover {
+  animation: glitch 0.1s linear infinite;
+}
+
+@keyframes glitch {
+  0% {
+    clip-path: inset(40% 0 61% 0);
+    transform: translate(-2px, 2px);
+  }
+  20% {
+    clip-path: inset(92% 0 1% 0);
+    transform: translate(2px, -2px);
+  }
+  40% {
+    clip-path: inset(43% 0 1% 0);
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    clip-path: inset(25% 0 58% 0);
+    transform: translate(2px, 2px);
+  }
+  80% {
+    clip-path: inset(54% 0 7% 0);
+    transform: translate(-2px, 2px);
+  }
+  100% {
+    clip-path: inset(58% 0 43% 0);
+    transform: translate(2px, -2px);
+  }
+}
+
+/* Pulsing border on everything */
+.chaos-image img {
+  animation: border-pulse 0.6s linear infinite;
+}
+
+@keyframes border-pulse {
+  0% { border-color: #ff0000; box-shadow: 0 0 30px #ff0000; }
+  25% { border-color: #00ff00; box-shadow: 0 0 30px #00ff00; }
+  50% { border-color: #0000ff; box-shadow: 0 0 30px #0000ff; }
+  75% { border-color: #ffff00; box-shadow: 0 0 30px #ffff00; }
+  100% { border-color: #ff00ff; box-shadow: 0 0 30px #ff00ff; }
+}
+
+/* Screen shake on the whole page - gentler version */
+@keyframes screen-shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-3px) rotate(-0.3deg); }
+  20% { transform: translateX(3px) rotate(0.3deg); }
+  30% { transform: translateX(-2px) rotate(0deg); }
+  40% { transform: translateX(2px) rotate(0.2deg); }
+  50% { transform: translateX(-2px) rotate(-0.2deg); }
+  60% { transform: translateX(2px) rotate(0deg); }
+  70% { transform: translateX(-2px) rotate(-0.2deg); }
+  80% { transform: translateX(2px) rotate(0.2deg); }
+  90% { transform: translateX(-1px) rotate(0deg); }
+}
+
+.chaos-container {
+  animation: screen-shake 0.6s linear infinite, hue-rotate 4s linear infinite;
+}
+
+/* Disco ball effect */
+.chaos-screen::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 20%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.3) 0%, transparent 20%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 30%),
+    radial-gradient(circle at 10% 80%, rgba(255,255,255,0.3) 0%, transparent 15%),
+    radial-gradient(circle at 90% 20%, rgba(255,255,255,0.3) 0%, transparent 15%);
+  animation: disco 0.5s linear infinite;
+  pointer-events: none;
+  z-index: 40;
+}
+
+@keyframes disco {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.5; }
+  50% { transform: rotate(180deg) scale(1.5); opacity: 0.8; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.5; }
+}
+
+/* Scavenger hunt glow effect */
+.scavenger-glow {
+  animation: scavenger-pulse 1s ease-in-out infinite;
+  text-shadow: 
+    0 0 20px rgba(34, 211, 238, 0.8),
+    0 0 40px rgba(34, 211, 238, 0.6),
+    0 0 60px rgba(34, 211, 238, 0.4);
+}
+
+@keyframes scavenger-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.02);
+    filter: brightness(1.2);
+  }
+}
+
+/* Make the chaos even more chaotic with perspective */
+.chaos-screen {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.chaos-image {
+  transform-style: preserve-3d;
+}
+
+.chaos-image:nth-child(odd) {
+  animation: chaos-spawn 0.3s ease-out, chaos-shake 0.5s ease-in-out infinite, float-3d 2s ease-in-out infinite;
+}
+
+@keyframes float-3d {
+  0%, 100% { transform: translateZ(0) rotateY(0deg); }
+  50% { transform: translateZ(50px) rotateY(10deg); }
+}
