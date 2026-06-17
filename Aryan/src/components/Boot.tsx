@@ -59,9 +59,6 @@ export function Boot({ ready }: { ready: boolean }) {
         params={{ speed: 0.5, refraction: 0.008, edge: 0.5, patternScale: 1.7 }}
         className="h-[34vh] max-h-[340px]"
       />
-      <div className="font-mono text-[10px] uppercase tracking-[0.45em] text-muted">
-        turning twenty-one
-      </div>
     </div>
   );
 }

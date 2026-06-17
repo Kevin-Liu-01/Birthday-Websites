@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-// Loops a background track and starts it on the first user interaction
-// (browsers block autoplay-with-sound until a gesture). Drop a file you own at
-// public/audio/backrooms.mp3 (or pass a different src).
+// Loops a background track. Attempts autoplay on load and falls back to the
+// first user gesture if the browser blocks autoplay-with-sound. Drop a file you
+// own at public/audio/aryan.mp3 (or pass a different src).
 export function MusicPlayer({ src = "/audio/aryan.mp3" }: { src?: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -18,9 +18,12 @@ export function MusicPlayer({ src = "/audio/aryan.mp3" }: { src?: string }) {
         a.volume = 0.55;
         await a.play();
       } catch {
-        // Missing file or blocked — the toggle button still works.
+        // Blocked by autoplay policy — a gesture (below) starts it instead.
       }
     };
+    // Attempt to play immediately on load; if the browser blocks
+    // autoplay-with-sound, the first pointer/key gesture kicks it off.
+    start();
     window.addEventListener("pointerdown", start);
     window.addEventListener("keydown", start);
     return () => {

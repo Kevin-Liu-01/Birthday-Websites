@@ -39,6 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# copyrighted audio — supply your own, never commit
-/public/audio/*.mp3

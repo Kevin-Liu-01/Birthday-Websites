@@ -16,6 +16,9 @@ uniform float u_refraction;
 uniform float u_edge;
 uniform float u_patternBlur;
 uniform float u_liquid;
+uniform vec3 u_color1;
+uniform vec3 u_color2;
+uniform float u_mono;
 
 #define TWO_PI 6.28318530718
 #define PI 3.14159265358979323846
@@ -114,8 +117,8 @@ void main() {
   vec3 color = vec3(0.);
   float opacity = 1.;
 
-  vec3 color1 = vec3(1., 1., 1.);
-  vec3 color2 = vec3(.08, .08, .08);
+  vec3 color1 = u_color1;
+  vec3 color2 = u_color2;
 
   float edge = img.r;
 
@@ -186,10 +189,16 @@ void main() {
   w[1] -= .02 * smoothstep(.0, 1., edge + bulge);
   float stripe_r = mod(dir + refr_r, 1.);
   float r = get_color_channel(color1.r, color2.r, stripe_r, w, 0.02 + .03 * u_refraction * bulge, bulge);
-  float stripe_g = mod(dir, 1.);
-  float g = get_color_channel(color1.g, color2.g, stripe_g, w, 0.01 / (1. - diagonal), bulge);
-  float stripe_b = mod(dir - refr_b, 1.);
-  float b = get_color_channel(color1.b, color2.b, stripe_b, w, .01, bulge);
+  float g = r;
+  float b = r;
+  // u_mono collapses the three channels onto one -> neutral chrome with full
+  // metallic depth and zero chromatic fringe (used by the silver "HAPPY 21").
+  if (u_mono < 0.5) {
+    float stripe_g = mod(dir, 1.);
+    g = get_color_channel(color1.g, color2.g, stripe_g, w, 0.01 / (1. - diagonal), bulge);
+    float stripe_b = mod(dir - refr_b, 1.);
+    b = get_color_channel(color1.b, color2.b, stripe_b, w, .01, bulge);
+  }
 
   color = vec3(r, g, b);
 

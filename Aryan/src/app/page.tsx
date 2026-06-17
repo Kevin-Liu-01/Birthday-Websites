@@ -37,12 +37,10 @@ export default function Home() {
         <ShaderBackground />
       </div>
 
-      {/* Header */}
-      <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-5 py-4 font-mono text-[10px] uppercase tracking-[0.4em] text-white mix-blend-difference md:px-8">
-        <span>&#10015; aryan</span>
-        <span className="hidden md:inline">opium // mmxxvi</span>
-        <span>happy birthday</span>
-      </header>
+      {/* Top ticker (carousel) */}
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-background/50 py-2 text-xl backdrop-blur-sm md:text-2xl">
+        <Marquee text="happy birthday aryan" />
+      </div>
 
       <main className="relative">
         {/* Black wash: clear over the hero so the liquid shows, fading to
@@ -57,50 +55,45 @@ export default function Home() {
 
         {/* Hero */}
         <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-4 pt-16">
-          {/* Aryan feathered into the liquid on the right (double-exposure, red). */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full md:w-[62%] lg:w-[56%]">
-            <div className="relative h-full w-full [-webkit-mask-image:radial-gradient(ellipse_74%_82%_at_68%_44%,#000_24%,transparent_76%)] [mask-image:radial-gradient(ellipse_74%_82%_at_68%_44%,#000_24%,transparent_76%)]">
-              <Image
-                src="/aryan.jpg"
-                alt="Aryan"
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 58vw"
-                className="object-cover object-[44%_20%] opacity-[0.95] brightness-[0.92] contrast-110 grayscale"
+          {/* Foreground: ARYAN is the vertically-centered anchor; HAPPY 21
+              floats just above it. The name sits BEHIND the cutout (z-20) so
+              his body occludes it (depth). */}
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="relative flex items-center justify-center">
+              <LiquidMetal
+                text="ARYAN"
+                className="w-[90vw] max-w-[1040px] drop-shadow-[0_10px_60px_rgba(0,0,0,0.6)]"
+                onReady={() => setLiquidReady(true)}
               />
-              <div className="absolute inset-0 bg-accent opacity-[0.22] mix-blend-color" />
-              <div className="scanlines absolute inset-0 opacity-30" />
+              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 translate-y-[70%]">
+                <LiquidMetal
+                  text="HAPPY 21"
+                  colors={{ c1: [1, 1, 1], c2: [0.08, 0.08, 0.09] }}
+                  mono
+                  iterations={130}
+                  className="w-[150px] drop-shadow-[0_3px_16px_rgba(0,0,0,0.7)] md:w-[240px]"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Foreground */}
-          <div className="relative z-10 flex flex-col items-center">
-            <p className="mb-6 animate-flicker font-mono text-[11px] uppercase tracking-[0.6em] text-white/85 [text-shadow:0_1px_22px_rgba(0,0,0,0.95)] md:text-sm">
-              happy&nbsp;&nbsp;birthday
-            </p>
-
-            <LiquidMetal
-              text="ARYAN"
-              className="w-[82vw] max-w-[880px] drop-shadow-[0_10px_60px_rgba(0,0,0,0.6)]"
-              onReady={() => setLiquidReady(true)}
+          {/* Aryan cutout (black & white), layered above the name so his body
+              occludes it -> the letters read as passing behind him (depth). */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-[64%] md:w-[60%] lg:w-[56%]">
+            <Image
+              src="/aryan-cutout5.png"
+              alt="Aryan"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 58vw"
+              className="object-cover object-[44%_20%] brightness-[0.96] contrast-110 grayscale drop-shadow-[0_18px_50px_rgba(0,0,0,0.6)]"
             />
-
-            <p className="mt-6 font-gothic text-2xl text-foreground [text-shadow:0_2px_26px_rgba(0,0,0,0.95)] md:text-4xl">
-              born in the dark &#10015; blessed in chrome
-            </p>
           </div>
 
-          <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-white/70 [text-shadow:0_1px_16px_rgba(0,0,0,0.9)]">
-              scroll
-            </span>
-            <span className="h-10 w-px animate-float bg-gradient-to-b from-white/70 to-transparent" />
-          </div>
-        </section>
-
-        {/* Marquee band */}
-        <section className="relative border-y border-white/10 bg-background/50 py-3 text-3xl backdrop-blur-sm md:py-4 md:text-5xl">
-          <Marquee text="happy birthday aryan" />
+          {/* Tagline sits ABOVE the cutout (z-30) -> reads in front of him. */}
+          <p className="absolute inset-x-0 bottom-[8vh] z-30 px-4 text-center font-gothic text-2xl text-foreground [text-shadow:0_2px_26px_rgba(0,0,0,0.95)] md:text-4xl">
+            born in the dark &#10015; blessed in chrome
+          </p>
         </section>
 
         {/* Dedication */}
@@ -157,25 +150,6 @@ export default function Home() {
               </span>
               <span className="absolute inset-0 origin-bottom scale-y-0 bg-accent transition-transform duration-300 group-hover:scale-y-100" />
             </button>
-          </Reveal>
-        </section>
-
-        {/* Outro */}
-        <section className="relative flex min-h-[80svh] flex-col items-center justify-center gap-8 px-6 text-center">
-          <Reveal>
-            <p className="font-mono text-[11px] uppercase tracking-[0.4em] text-muted">
-              // many happy returns
-            </p>
-          </Reveal>
-          <Reveal delay={80}>
-            <h2 className="chrome-fallback font-display text-[26vw] leading-[0.8] tracking-tight md:text-[15vw]">
-              HBD
-            </h2>
-          </Reveal>
-          <Reveal delay={160}>
-            <p className="font-gothic text-2xl text-foreground/70 md:text-3xl">
-              see you on the other side, aryan &#10015;
-            </p>
           </Reveal>
         </section>
 

@@ -16,12 +16,18 @@ export type LiquidParams = {
 
 const DEFAULTS: LiquidParams = {
   patternScale: 2,
-  refraction: 0.0025,
+  refraction: 0.001,
   edge: 0.4,
   patternBlur: 0.005,
   liquid: 0.05,
   speed: 0.32,
 };
+
+export type LiquidColors = { c1: [number, number, number]; c2: [number, number, number] };
+
+// Default tint is the opium red (ARYAN + the boot counter). Pass a silver pair
+// for clean chrome.
+const DEFAULT_COLORS: LiquidColors = { c1: [1.0, 0.32, 0.2], c2: [0.4, 0.0, 0.0] };
 
 function compile(gl: WebGL2RenderingContext, src: string, type: number) {
   const shader = gl.createShader(type);
@@ -43,6 +49,8 @@ export function LiquidMetal({
   onReady,
   iterations = 200,
   maskMax,
+  colors,
+  mono = false,
 }: {
   text: string;
   className?: string;
@@ -50,6 +58,8 @@ export function LiquidMetal({
   onReady?: () => void;
   iterations?: number;
   maskMax?: { w: number; h: number };
+  colors?: LiquidColors;
+  mono?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,6 +69,11 @@ export function LiquidMetal({
   const merged: LiquidParams = { ...DEFAULTS, ...params };
   const paramsRef = useRef(merged);
   paramsRef.current = merged;
+
+  const colorsRef = useRef<LiquidColors>(colors ?? DEFAULT_COLORS);
+  colorsRef.current = colors ?? DEFAULT_COLORS;
+  const monoRef = useRef(mono);
+  monoRef.current = mono;
 
   // Depend on primitive sizes, not the object identity, to avoid re-running.
   const mw = maskMax?.w;
@@ -170,6 +185,10 @@ export function LiquidMetal({
     gl.uniform1f(uniforms.u_patternScale, p.patternScale);
     gl.uniform1f(uniforms.u_refraction, p.refraction);
     gl.uniform1f(uniforms.u_liquid, p.liquid);
+    const col = colorsRef.current;
+    gl.uniform3fv(uniforms.u_color1, col.c1);
+    gl.uniform3fv(uniforms.u_color2, col.c2);
+    gl.uniform1f(uniforms.u_mono, monoRef.current ? 1 : 0);
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const resize = () => {

@@ -11,8 +11,8 @@ export default function ShaderBackgroundImpl({ onReady }: { onReady?: () => void
       <SolidColor color="#0a0a0a" />
       <Swirl
         blend={46}
-        colorA="#f4f4f4"
-        colorB="#161616"
+        colorA="#9a9a9a"
+        colorB="#0e0e0e"
         colorSpace="oklab"
         detail={2.6}
         speed={0.16}
