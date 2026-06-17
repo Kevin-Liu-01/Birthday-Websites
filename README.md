@@ -18,6 +18,13 @@ Cathy's 22nd birthday website.
 ### [Windsor](/Windsor)
 Windsor's birthday website with meme audio and animations.
 
+### [Aryan](/Aryan)
+Aryan's 21st birthday site — a dark, avant-garde "opium" aesthetic. Features:
+- Liquid-metal chrome `ARYAN` name (ported from paper-design/liquid-logo) over a living glass-shader background
+- A loader that counts to 21 with the digits rendered through the chrome shader
+- Click-to-enter full-screen 3D experience: 32 photos orbiting a giant chrome cross, with **reel** and **glitch/VHS** modes
+- Looping background track (supplied separately)
+
 ## Tags
 
-`birthday` `surprise` `next.js` `react` `framer-motion` `tailwindcss` `team-culture`
+`birthday` `surprise` `next.js` `react` `three.js` `webgl` `shaders` `framer-motion` `tailwindcss` `team-culture`
