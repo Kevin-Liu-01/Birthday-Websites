@@ -44,10 +44,10 @@ const glyph = Noto_Sans_Egyptian_Hieroglyphs({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "ARYAN \u271F 21",
-  description: "A birthday shrine. Opium aesthetic, liquid chrome, and the archive.",
+  description: "A birthday shrine for Aryan. Liquid chrome, the labyrinth, and the reliquary.",
   openGraph: {
     title: "ARYAN \u271F HAPPY BIRTHDAY",
-    description: "A birthday shrine. Opium aesthetic, liquid chrome, and the archive.",
+    description: "A birthday shrine for Aryan. Liquid chrome, the labyrinth, and the reliquary.",
     images: ["/photos/photo-01.jpg"],
   },
 };

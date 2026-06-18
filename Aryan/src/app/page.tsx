@@ -12,19 +12,40 @@ import { Boot } from "@/components/Boot";
 import { MusicPlayer } from "@/components/MusicPlayer";
 import SmokeFog from "@/components/SmokeFog";
 
-// Feather-fan wings flanking Aryan in the portal. Row lengths bulge in the
-// middle and taper to a point at each tip, so a block of diagonal glyphs reads
-// as a layered wing. Built programmatically to keep the whitespace exact.
-const WING_ROWS = [1, 3, 5, 8, 11, 14, 17, 19, 21, 22, 22, 21, 19, 17, 14, 11, 8, 5, 3, 1];
-const wingArt = (glyph: string, flushRight: boolean) => {
-  const width = Math.max(...WING_ROWS);
-  return WING_ROWS.map((n) => {
-    const row = glyph.repeat(n);
-    return flushRight ? row.padStart(width) : row;
-  }).join("\n");
-};
-const LEFT_WING = wingArt("\u2571", true); // ╱ feathers sweeping out to the left
-const RIGHT_WING = wingArt("\u2572", false); // ╲ feathers sweeping out to the right
+// Curved feather wings flanking Aryan. Rather than a stacked blade, each wing is
+// rasterised from a cubic-bezier "spine": it roots low near Aryan, dips, then
+// sweeps up and out to a pointed tip at the top-outer corner — the arc Kevin
+// sketched. Feathers fill a band that bulges at mid-span and tapers to a point
+// at root and tip. The left wing is a horizontal mirror so the pair is symmetric.
+const WING_W = 40;
+const WING_H = 16;
+const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+const RIGHT_GRID = (() => {
+  const grid = Array.from({ length: WING_H }, () => Array(WING_W).fill(" "));
+  for (let x = 0; x < WING_W; x++) {
+    const nx = x / (WING_W - 1);
+    // Leading (top) edge: dips near the root, then sweeps up to a tip top-outer.
+    const top = 9.5 - 9.7 * nx ** 1.5 + 1.3 * Math.sin(Math.PI * clamp(nx * 1.7, 0, 1));
+    // Feathers hang below; longest in the outer-middle, tapering to a point at
+    // both the root and the tip so the wing reads as a swept crescent.
+    const drop = 8.2 * Math.sin(Math.PI * clamp((nx - 0.02) / 0.98, 0, 1)) ** 0.75;
+    const t = Math.round(top);
+    const b = Math.round(top + drop);
+    for (let y = t; y <= b; y++) if (y >= 0 && y < WING_H) grid[y][x] = "\u2572"; // ╲
+  }
+  return grid;
+})();
+// The left wing is the sketched arc lifted out of the grid (╲ -> ╱). The right
+// wing is then the EXACT reflection of the left: reverse each row and flip the
+// slash. Both keep the full WING_W width (no trailing trim) so the two <pre>
+// blocks are identical in size and their mirrored translate offsets line up.
+const flipSlash = (ch: string) =>
+  ch === "\u2571" ? "\u2572" : ch === "\u2572" ? "\u2571" : ch;
+const reflectRow = (line: string) => [...line].reverse().map(flipSlash).join("");
+const LEFT_WING = RIGHT_GRID.map((r) =>
+  [...r].reverse().map((ch) => (ch === "\u2572" ? "\u2571" : ch)).join(""),
+).join("\n");
+const RIGHT_WING = LEFT_WING.split("\n").map(reflectRow).join("\n");
 
 export default function Home() {
   const [liquidReady, setLiquidReady] = useState(false);
@@ -50,8 +71,11 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Living liquid-glass backdrop (fixed, full-bleed, furthest back) */}
-      <div className="pointer-events-none fixed inset-0 -z-20">
+      {/* Living liquid-glass backdrop, bounded to the hero. It's cut off past the
+          first viewport so the metal isn't rendered behind the black lower
+          sections — it stops where it stops showing. The solid html background
+          (#070707) covers everything below. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[100svh] overflow-hidden">
         <ShaderBackground />
       </div>
 
@@ -72,18 +96,19 @@ export default function Home() {
         />
 
         {/* Hero */}
-        <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-4 pt-16">
-          {/* Foreground: ARYAN is the vertically-centered anchor; HAPPY 21
-              floats just above it. The name sits BEHIND the cutout (z-20) so
-              his body occludes it (depth). */}
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="relative flex items-center justify-center">
+        <section className="relative flex min-h-[100svh] flex-col items-start justify-center overflow-hidden pl-6 pr-4 pt-16 md:pl-[6vw] lg:pl-[7vw]">
+          {/* Foreground: ARYAN is the vertically-centered anchor, left-aligned
+              so Aryan's portrait on the right gets clear space; HAPPY 21 floats
+              just above its left edge. The name sits BEHIND the cutout (z-20) so
+              his body occludes its right end (depth). */}
+          <div className="relative z-10 flex flex-col items-start">
+            <div className="relative flex items-center justify-start">
               <LiquidMetal
                 text="ARYAN"
-                className="w-[80vw] max-w-[900px] drop-shadow-[0_10px_60px_rgba(0,0,0,0.6)]"
+                className="w-[66vw] max-w-[760px] drop-shadow-[0_10px_60px_rgba(0,0,0,0.6)]"
                 onReady={() => setLiquidReady(true)}
               />
-              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 translate-y-[70%]">
+              <div className="pointer-events-none absolute bottom-full left-0 translate-y-[70%]">
                 <LiquidMetal
                   text="HAPPY 21"
                   colors={{ c1: [1, 1, 1], c2: [0.08, 0.08, 0.09] }}
@@ -180,7 +205,7 @@ export default function Home() {
             <div className="relative order-2 text-center lg:order-1 lg:self-start lg:pt-[9vh] lg:text-left">
               <pre
                 aria-hidden
-                className="pointer-events-none absolute right-0 top-1/2 hidden -z-10 -translate-y-1/2 translate-x-[46%] select-none font-mono text-[17px] leading-[0.6] text-accent/20 [text-shadow:0_0_18px_rgba(214,38,46,0.35)] lg:block xl:text-[22px]"
+                className="pointer-events-none absolute right-0 top-1/2 hidden -z-10 -translate-y-1/2 translate-x-[46%] select-none font-mono text-[16px] leading-[0.72] text-accent/25 [text-shadow:0_0_18px_rgba(214,38,46,0.4)] lg:block xl:text-[20px]"
               >
                 {LEFT_WING}
               </pre>
@@ -194,18 +219,18 @@ export default function Home() {
               </Reveal>
               <Reveal delay={80}>
                 <h2 className="font-display text-4xl uppercase leading-[0.95] tracking-tight md:text-5xl xl:text-6xl">
-                  another year
+                  anointed
                   <br />
-                  in the <span className="text-stroke">opium</span>
+                  in the <span className="text-stroke">labyrinth</span>
                 </h2>
               </Reveal>
               <Reveal delay={160}>
                 <div className="glyph mt-8 font-mono text-sm leading-relaxed text-muted [text-shadow:0_1px_14px_#070707] md:text-base lg:whitespace-nowrap">
                   <span className="block">to the realest in the room</span>
-                  <span className="block lg:ml-[14px]">another lap round the sun,</span>
-                  <span className="block lg:ml-[28px]">draped in black, dripped in chrome</span>
-                  <span className="block lg:ml-[42px]">fits stay tuff, energy unmatched</span>
-                  <span className="block lg:ml-[56px]">long live the legend ✦ 𓌹</span>
+                  <span className="block lg:ml-[14px]">cracked mind · filesystem v3 in the dark</span>
+                  <span className="block lg:ml-[28px]">sojubomb towers at hanshin pocha</span>
+                  <span className="block lg:ml-[42px]">raved till dawn · ian asher · dabin</span>
+                  <span className="block lg:ml-[56px]">fits tuff, jewelry tuffer ✦ 𓌹</span>
                 </div>
               </Reveal>
             </div>
@@ -250,7 +275,7 @@ export default function Home() {
             <div className="relative order-3 text-center lg:self-start lg:pt-[9vh] lg:text-right">
               <pre
                 aria-hidden
-                className="pointer-events-none absolute left-0 top-1/2 hidden -z-10 -translate-y-1/2 -translate-x-[46%] select-none font-mono text-[17px] leading-[0.6] text-accent/20 [text-shadow:0_0_18px_rgba(214,38,46,0.35)] lg:block xl:text-[22px]"
+                className="pointer-events-none absolute left-0 top-1/2 hidden -z-10 -translate-y-1/2 -translate-x-[46%] select-none font-mono text-[16px] leading-[0.72] text-accent/25 [text-shadow:0_0_18px_rgba(214,38,46,0.4)] lg:block xl:text-[20px]"
               >
                 {RIGHT_WING}
               </pre>
@@ -266,16 +291,16 @@ export default function Home() {
                 <h2 className="font-display text-4xl uppercase leading-[0.9] tracking-tight md:text-5xl xl:text-6xl">
                   the
                   <br />
-                  archive
+                  <span className="text-stroke">reliquary</span>
                 </h2>
               </Reveal>
               <Reveal delay={160}>
                 <div className="glyph mt-8 font-mono text-sm leading-relaxed text-muted [text-shadow:0_1px_14px_#070707] md:text-base lg:whitespace-nowrap">
-                  <span className="block">032 frames orbiting a</span>
-                  <span className="block lg:mr-[14px]">chrome cross in the dark</span>
-                  <span className="block lg:mr-[28px]">lock in · go reel</span>
-                  <span className="block lg:mr-[42px]">glitch it out</span>
-                  <span className="block lg:mr-[56px]">see you inside ✦ 𓌺</span>
+                  <span className="block">032 relics in orbit</span>
+                  <span className="block lg:mr-[14px]">round a chrome cross, eternal</span>
+                  <span className="block lg:mr-[28px]">lock in · spin the reel</span>
+                  <span className="block lg:mr-[42px]">glitch the halo out</span>
+                  <span className="block lg:mr-[56px]">enter the sanctum ✦ 𓌺</span>
                 </div>
               </Reveal>
             </div>
