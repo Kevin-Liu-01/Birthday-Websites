@@ -19,6 +19,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Decorative ascii crest: Egyptian hieroglyph wings fall back to mono for the
+   chain/cross/star glyphs (per-glyph font fallback). Unlayered so it wins over
+   Tailwind's font-mono utility. */
+.glyph {
+  font-family: var(--font-glyph), var(--font-mono), ui-monospace, monospace;
+}
+
 @layer base {
   html {
     background: var(--background);

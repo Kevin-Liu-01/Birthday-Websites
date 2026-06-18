@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const TARGET = 21;
 const COUNT_MS = 2800;
 
-export function Boot({ ready }: { ready: boolean }) {
+export function Boot({ ready, onDone }: { ready: boolean; onDone?: () => void }) {
   const [hidden, setHidden] = useState(false);
   const [n, setN] = useState(0);
 
@@ -25,12 +25,14 @@ export function Boot({ ready }: { ready: boolean }) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Leave once the page is ready AND the count has landed on 21.
+  // Leave once the page is ready AND the count has landed on 21. Signal the
+  // page the instant we start dismissing so the hero reveal overlaps our fade.
   useEffect(() => {
     if (!(ready && n >= TARGET)) return;
+    onDone?.();
     const t = setTimeout(() => setHidden(true), 520);
     return () => clearTimeout(t);
-  }, [ready, n]);
+  }, [ready, n, onDone]);
 
   useEffect(() => {
     if (hidden) return;

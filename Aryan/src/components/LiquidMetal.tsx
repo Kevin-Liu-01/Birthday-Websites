@@ -170,12 +170,16 @@ export function LiquidMetal({
     textureRef.current = texture;
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    // Trilinear minification: the bevel mask is built large and often drawn
+    // small. Without mipmaps that heavy downscale aliases into moire/contour
+    // rings on curved glyphs. Mipmaps average each level cleanly.
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
+    gl.generateMipmap(gl.TEXTURE_2D);
     gl.uniform1i(uniforms.u_image_texture, 0);
     gl.uniform1f(uniforms.u_img_ratio, 1);
 
@@ -255,6 +259,7 @@ export function LiquidMetal({
       gl.UNSIGNED_BYTE,
       imageData.data,
     );
+    gl.generateMipmap(gl.TEXTURE_2D);
     gl.uniform1f(uniformsRef.current.u_img_ratio, imageData.width / imageData.height);
     if (!signalledRef.current) {
       signalledRef.current = true;
