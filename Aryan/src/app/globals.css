@@ -188,6 +188,36 @@
   }
 }
 
+@keyframes wing-flash {
+  0%,
+  100% {
+    color: rgba(225, 6, 0, 0.25);
+  }
+  50% {
+    color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+@keyframes crest-flash {
+  0%,
+  100% {
+    color: rgba(225, 6, 0, 0.85);
+  }
+  50% {
+    color: #fff;
+  }
+}
+
+@keyframes hat-flash {
+  0%,
+  100% {
+    color: rgba(225, 6, 0, 0.7);
+  }
+  50% {
+    color: #fff;
+  }
+}
+
 @layer utilities {
   .grain::after {
     content: "";
@@ -240,6 +270,41 @@
   }
   .animate-progress {
     animation: progress linear forwards;
+  }
+  .animate-wing-flash {
+    animation: wing-flash 0.85s ease-in-out both;
+  }
+  .animate-crest-flash {
+    animation: crest-flash 0.85s ease-in-out both;
+  }
+  .animate-hat-flash {
+    animation: hat-flash 0.85s ease-in-out both;
+  }
+
+  /* Bottom-cut trapezoids (x-flipped). Shell = 1px stroke that follows the clip. */
+  .trapezoid-shell-left {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 14px 100%);
+    padding: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s;
+  }
+  .trapezoid-shell-right {
+    clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+    padding: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s;
+  }
+  .trapezoid-shell-left:has(button:hover),
+  .trapezoid-shell-right:has(button:hover) {
+    background: var(--accent);
+  }
+  .trapezoid-inner-left {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 14px 100%);
+    background: var(--background);
+  }
+  .trapezoid-inner-right {
+    clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+    background: var(--background);
   }
   .animate-reel-left {
     animation: marquee 70s linear infinite;

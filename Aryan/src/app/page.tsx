@@ -11,6 +11,14 @@ import { Reveal } from "@/components/Reveal";
 import { Boot } from "@/components/Boot";
 import { MusicPlayer } from "@/components/MusicPlayer";
 import SmokeFog from "@/components/SmokeFog";
+import { cn } from "@/lib/utils";
+
+// The hero reveal light is clipped to Aryan's shadow silhouette (the same
+// backing PNG drawn behind him) so the red scan and bloom trace his shape
+// instead of spanning a flat rectangle. mask-size/position mirror the photos'
+// object-cover / object-[44%_20%] so the mask lines up pixel-for-pixel.
+const SILHOUETTE_MASK =
+  "[mask-image:url(/aryan-hair-backing.png)] [mask-size:cover] [mask-position:44%_20%] [mask-repeat:no-repeat] [-webkit-mask-image:url(/aryan-hair-backing.png)] [-webkit-mask-size:cover] [-webkit-mask-position:44%_20%] [-webkit-mask-repeat:no-repeat]";
 
 // Curved feather wings flanking Aryan. Rather than a stacked blade, each wing is
 // rasterised from a cubic-bezier "spine": it roots low near Aryan, dips, then
@@ -47,10 +55,33 @@ const LEFT_WING = RIGHT_GRID.map((r) =>
 ).join("\n");
 const RIGHT_WING = LEFT_WING.split("\n").map(reflectRow).join("\n");
 
+// ASCII cap perched on Aryan's head in the portal lookdown frame.
+const ARYAN_HAT = [
+  "     ___________",
+  "    /           \\",
+  "   |    _____    |",
+  "   |   /     \\   |",
+  "    \\ |_____|  /",
+  "     \\_________/",
+  "     '---------'",
+].join("\n");
+
 export default function Home() {
   const [liquidReady, setLiquidReady] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [heroIn, setHeroIn] = useState(false);
+  const [wingsFlashing, setWingsFlashing] = useState(false);
+
+  const flashWings = useCallback(() => {
+    setWingsFlashing(false);
+    requestAnimationFrame(() => setWingsFlashing(true));
+  }, []);
+
+  useEffect(() => {
+    if (!wingsFlashing) return;
+    const t = setTimeout(() => setWingsFlashing(false), 900);
+    return () => clearTimeout(t);
+  }, [wingsFlashing]);
 
   // Safety net: never trap the visitor behind the loader if the GPU stalls.
   useEffect(() => {
@@ -139,10 +170,11 @@ export default function Home() {
               sizes="(max-width: 768px) 100vw, 58vw"
               className="object-cover object-[44%_20%]"
             />
-            {/* Aryan "develops" over his own shadow: a downward scan wipe
-                resolves the crisp photo (blurred -> sharp, zoom settles) while
-                a chrome/red light bar sweeps the leading edge, like the figure
-                being printed into existence. Fires when the loader clears. */}
+            {/* Aryan develops over his own shadow: the photo wipes in (blurred
+                -> sharp, zoom settles) while a red scan-light and bloom ride his
+                silhouette. The light layers are masked to the backing shape so
+                they trace his shadow's crop, not a flat band. Fires when the
+                loader clears. */}
             <motion.div
               className="absolute inset-0 overflow-hidden"
               initial={{
@@ -161,7 +193,7 @@ export default function Home() {
                     }
                   : undefined
               }
-              transition={{ duration: 1.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
             >
               <Image
                 src="/aryan-cutout6.png"
@@ -172,18 +204,31 @@ export default function Home() {
                 className="object-cover object-[44%_20%] brightness-[0.96] contrast-110 grayscale drop-shadow-[0_18px_50px_rgba(0,0,0,0.6)]"
               />
             </motion.div>
+            {/* Red bloom in the exact shape of his shadow — glows up as he
+                resolves, then fades, leaving the photo black & white. */}
             <motion.div
               aria-hidden
-              className="absolute inset-x-0 z-[1] h-[16%] mix-blend-screen bg-[linear-gradient(to_bottom,transparent,rgba(214,38,46,0.25)_35%,rgba(255,255,255,0.7)_50%,rgba(214,38,46,0.25)_65%,transparent)]"
-              initial={{ top: "-18%", opacity: 0 }}
-              animate={heroIn ? { top: ["-18%", "104%"], opacity: [0, 1, 1, 0] } : undefined}
-              transition={{ duration: 1.7, ease: [0.16, 1, 0.3, 1], times: [0, 0.12, 0.86, 1] }}
+              className={cn("absolute inset-0 z-[1] bg-accent mix-blend-screen blur-2xl", SILHOUETTE_MASK)}
+              initial={{ opacity: 0 }}
+              animate={heroIn ? { opacity: [0, 0.75, 0.3, 0] } : undefined}
+              transition={{ duration: 1.8, ease: "easeInOut", times: [0, 0.42, 0.7, 1] }}
             />
+            {/* Red scan-light, clipped to his silhouette so the leading edge
+                rides down his form (head -> shoulders -> chest). */}
+            <div className={cn("absolute inset-0 z-[2] overflow-hidden", SILHOUETTE_MASK)}>
+              <motion.div
+                aria-hidden
+                className="absolute inset-x-0 h-[28%] mix-blend-screen blur-[3px] bg-[linear-gradient(to_bottom,transparent,rgba(225,6,0,0.5)_40%,rgba(255,72,48,0.95)_50%,rgba(225,6,0,0.5)_60%,transparent)]"
+                initial={{ top: "-28%", opacity: 0 }}
+                animate={heroIn ? { top: ["-28%", "104%"], opacity: [0, 1, 1, 0] } : undefined}
+                transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], times: [0, 0.1, 0.85, 1] }}
+              />
+            </div>
           </div>
 
           {/* Tagline sits ABOVE the cutout (z-30) -> reads in front of him. */}
           <p className="absolute inset-x-0 bottom-[8vh] z-30 px-4 text-center font-gothic text-2xl text-foreground [text-shadow:0_2px_26px_rgba(0,0,0,0.95)] md:text-4xl">
-            twenty-one laps &#10015; drip in chrome
+            twenty one &#10015; just getting started
           </p>
         </section>
 
@@ -205,7 +250,10 @@ export default function Home() {
             <div className="relative order-2 text-center lg:order-1 lg:self-start lg:pt-[9vh] lg:text-left">
               <pre
                 aria-hidden
-                className="pointer-events-none absolute right-0 top-1/2 hidden -z-10 -translate-y-1/2 translate-x-[46%] select-none font-mono text-[16px] leading-[0.72] text-accent/25 [text-shadow:0_0_18px_rgba(214,38,46,0.4)] lg:block xl:text-[20px]"
+                className={cn(
+                  "pointer-events-none absolute right-0 top-1/2 hidden -z-10 -translate-y-1/2 translate-x-[46%] select-none font-mono text-[16px] leading-[0.72] text-accent/25 [text-shadow:0_0_18px_rgba(214,38,46,0.4)] lg:block xl:text-[20px]",
+                  wingsFlashing && "animate-wing-flash",
+                )}
               >
                 {LEFT_WING}
               </pre>
@@ -221,32 +269,67 @@ export default function Home() {
                 <h2 className="font-display text-4xl uppercase leading-[0.95] tracking-tight md:text-5xl xl:text-6xl">
                   anointed
                   <br />
-                  in the <span className="text-stroke">labyrinth</span>
+                  in the <span className="text-stroke">pocha</span>
                 </h2>
+              </Reveal>
+              <Reveal delay={120}>
+                <span className="trapezoid-shell-left mt-6 inline-block lg:mr-auto">
+                  <button
+                    type="button"
+                    onClick={flashWings}
+                    aria-label="Flash the wings and crest"
+                    className="group relative block px-8 py-3 font-mono text-[10px] uppercase tracking-[0.35em] text-foreground transition-colors trapezoid-inner-left"
+                  >
+                    <span className="relative z-10 transition-colors group-hover:text-white">
+                      spread &#10022; wings
+                    </span>
+                    <span className="absolute inset-0 origin-bottom scale-y-0 bg-accent transition-transform duration-300 group-hover:scale-y-100" />
+                  </button>
+                </span>
               </Reveal>
               <Reveal delay={160}>
                 <div className="glyph mt-8 font-mono text-sm leading-relaxed text-muted [text-shadow:0_1px_14px_#070707] md:text-base lg:whitespace-nowrap">
-                  <span className="block">to the realest in the room</span>
-                  <span className="block lg:ml-[14px]">cracked mind · filesystem v3 in the dark</span>
-                  <span className="block lg:ml-[28px]">sojubomb towers at hanshin pocha</span>
-                  <span className="block lg:ml-[42px]">raved till dawn · ian asher · dabin</span>
-                  <span className="block lg:ml-[56px]">fits tuff, jewelry tuffer ✦ 𓌹</span>
+                  <span className="block invisible select-none" aria-hidden>
+                    .
+                  </span>
+                  <span className="block invisible select-none lg:ml-[14px]" aria-hidden>
+                    .
+                  </span>
+                  <span className="block invisible select-none lg:ml-[28px]" aria-hidden>
+                    .
+                  </span>
+                  <span className="block invisible select-none lg:ml-[42px]" aria-hidden>
+                    .
+                  </span>
+                  <span className="block lg:ml-[56px]">𓌹 ✦ this guy is a tank</span>
                 </div>
               </Reveal>
-            </div>
+        </div>
 
             {/* Center — Aryan looking down, legs lost in fog, enter below */}
             <div className="order-1 flex flex-col items-center lg:order-2 lg:self-center">
               <Reveal>
                 <p
                   aria-hidden
-                  className="glyph mb-5 text-base tracking-[0.45em] text-accent/85 [text-shadow:0_1px_16px_#070707] md:text-lg"
+                  className={cn(
+                    "glyph mb-5 text-base tracking-[0.45em] text-accent/85 [text-shadow:0_1px_16px_#070707] md:text-lg",
+                    wingsFlashing && "animate-crest-flash",
+                  )}
                 >
                   ⛓ 𓌹 ✦ ♰ ✦ 𓌺 ⛓
                 </p>
               </Reveal>
               <Reveal delay={40}>
                 <div className="relative w-[min(72vw,340px)]">
+                  <pre
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute left-1/2 top-[2%] z-10 -translate-x-1/2 select-none whitespace-pre font-mono text-[7px] leading-[1.08] text-accent/70 [text-shadow:0_0_14px_rgba(225,6,0,0.45)] sm:text-[8px] md:text-[9px]",
+                      wingsFlashing && "animate-hat-flash",
+                    )}
+                  >
+                    {ARYAN_HAT}
+                  </pre>
                   <Image
                     src="/aryan-lookdown-cutout.png"
                     alt="Aryan"
@@ -275,7 +358,10 @@ export default function Home() {
             <div className="relative order-3 text-center lg:self-start lg:pt-[9vh] lg:text-right">
               <pre
                 aria-hidden
-                className="pointer-events-none absolute left-0 top-1/2 hidden -z-10 -translate-y-1/2 -translate-x-[46%] select-none font-mono text-[16px] leading-[0.72] text-accent/25 [text-shadow:0_0_18px_rgba(214,38,46,0.4)] lg:block xl:text-[20px]"
+                className={cn(
+                  "pointer-events-none absolute left-0 top-1/2 hidden -z-10 -translate-y-1/2 -translate-x-[46%] select-none font-mono text-[16px] leading-[0.72] text-accent/25 [text-shadow:0_0_18px_rgba(214,38,46,0.4)] lg:block xl:text-[20px]",
+                  wingsFlashing && "animate-wing-flash",
+                )}
               >
                 {RIGHT_WING}
               </pre>
@@ -289,22 +375,45 @@ export default function Home() {
               </Reveal>
               <Reveal delay={80}>
                 <h2 className="font-display text-4xl uppercase leading-[0.9] tracking-tight md:text-5xl xl:text-6xl">
-                  the
+                  view the
                   <br />
-                  <span className="text-stroke">reliquary</span>
+                  <span className="text-stroke">archives</span>
                 </h2>
+              </Reveal>
+              <Reveal delay={120}>
+                <span className="trapezoid-shell-right mt-6 inline-block lg:ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setArchiveOpen(true)}
+                    aria-label="Open the photo archives"
+                    className="group relative block px-8 py-3 font-mono text-[10px] uppercase tracking-[0.35em] text-foreground transition-colors trapezoid-inner-right"
+                  >
+                    <span className="relative z-10 transition-colors group-hover:text-white">
+                      photos &#10015;
+                    </span>
+                    <span className="absolute inset-0 origin-bottom scale-y-0 bg-accent transition-transform duration-300 group-hover:scale-y-100" />
+                  </button>
+                </span>
               </Reveal>
               <Reveal delay={160}>
                 <div className="glyph mt-8 font-mono text-sm leading-relaxed text-muted [text-shadow:0_1px_14px_#070707] md:text-base lg:whitespace-nowrap">
-                  <span className="block">032 relics in orbit</span>
-                  <span className="block lg:mr-[14px]">round a chrome cross, eternal</span>
-                  <span className="block lg:mr-[28px]">lock in · spin the reel</span>
-                  <span className="block lg:mr-[42px]">glitch the halo out</span>
-                  <span className="block lg:mr-[56px]">enter the sanctum ✦ 𓌺</span>
+                  <span className="block invisible select-none" aria-hidden>
+                    .
+                  </span>
+                  <span className="block invisible select-none lg:mr-[14px]" aria-hidden>
+                    .
+                  </span>
+                  <span className="block invisible select-none lg:mr-[28px]" aria-hidden>
+                    .
+                  </span>
+                  <span className="block invisible select-none lg:mr-[42px]" aria-hidden>
+                    .
+                  </span>
+                  <span className="block lg:mr-[56px]">ts goes hard ✦ 𓌺</span>
                 </div>
               </Reveal>
             </div>
-          </div>
+        </div>
         </section>
       </main>
     </>
